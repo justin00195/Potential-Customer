@@ -7,14 +7,14 @@ import io
 API_URL = "http://127.0.0.1:8000/filter"
 
 # 設定標題
-st.title("進出口查詢系統")
+st.title("Import and export system")
 
 # 設定可選篩選欄位
 columns = ["Product_Description", "HS_Code", "Importer"]
-select_columns = st.selectbox("選擇篩選欄位", columns)
+select_columns = st.selectbox("Select Ｆilter", columns)
 
 # 使用者輸入關鍵字
-keywords = st.text_input("輸入關鍵字（可輸入多個，逗號分隔）", "")
+keywords = st.text_input("Enter keywords (Enter multiple keywords, separated by commas)", "")
 
 # 每頁顯示 10 筆
 page_size = 10
@@ -28,7 +28,7 @@ if "total_pages" not in st.session_state:
     st.session_state.total_pages = 1
 
 # 按鈕觸發 API 請求
-if st.button("開始篩選"):
+if st.button("Start"):
     if keywords:
         # 發送 API 請求
         formatted_keywords = ",".join([kw.strip() for kw in keywords.split(",") if kw.strip()])
@@ -51,7 +51,7 @@ if st.button("開始篩選"):
             else:
                 st.warning("No data for your keyword")
         else:
-            st.error(f"API 發生錯誤：{response.status_code}")
+            st.error(f"API error:{response.status_code}")
     else: 
         st.warning("Please enter a keyword")
 
@@ -71,17 +71,17 @@ if st.session_state.data:
 col1, col2 = st.columns([1, 1])
 
 with col1:
-    if st.button("上一頁"):
+    if st.button("Previous page"):
         if st.session_state.page_number > 1:
             st.session_state.page_number -= 1
 
 with col2:
-    if st.button("下一頁"):
+    if st.button("Next Page"):
         if st.session_state.page_number < st.session_state.total_pages:
             st.session_state.page_number += 1 
 
 
-if st.button("下載篩選結果"):
+if st.button("Download results"):
     if st.session_state.data:
         df_download = pd.DataFrame(st.session_state.data)
         output = io.BytesIO()
@@ -89,12 +89,12 @@ if st.button("下載篩選結果"):
         output.seek(0)
 
         st.download_button(
-            label="📥 下載 Excel",
+            label="Download Excel",
             data=output,
             file_name="filtered_data.xlsx",
             mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
         )
     else: 
-         st.warning("⚠️ 沒有數據可下載")
+         st.warning("NO data for download")
 
          
